@@ -1,0 +1,273 @@
+
+
+CREATE TABLE travel_course (
+    first_image VARCHAR(255),
+    first_image2 VARCHAR(255),
+    map_x VARCHAR(50),
+    map_y VARCHAR(50),
+    m_level VARCHAR(10),
+    addr2 VARCHAR(255),
+    area_code VARCHAR(10),
+    modified_time VARCHAR(20),
+    cpyrht_div_cd VARCHAR(10),
+    book_tour VARCHAR(10),
+    cat1 VARCHAR(50),
+    sigungu_code VARCHAR(10),
+    tel VARCHAR(20),
+    title VARCHAR(255),
+    addr1 VARCHAR(255),
+    cat2 VARCHAR(50),
+    cat3 VARCHAR(50),
+    content_id VARCHAR(50) PRIMARY KEY,
+    content_type_id VARCHAR(10),
+    created_time VARCHAR(20),
+    zipcode VARCHAR(10),
+    overview VARCHAR(999),
+    taketime VARCHAR(999),
+    distance VARCHAR(999)
+);
+
+
+
+CREATE TABLE accommodation (
+    first_image VARCHAR(255),
+    first_image2 VARCHAR(255),
+    map_x VARCHAR(50),
+    map_y VARCHAR(50),
+    m_level VARCHAR(10),
+    addr2 VARCHAR(255),
+    area_code VARCHAR(10),
+    modified_time VARCHAR(20),
+    cpyrht_div_cd VARCHAR(10),
+    book_tour VARCHAR(10),
+    cat1 VARCHAR(50),
+    sigungu_code VARCHAR(10),
+    tel VARCHAR(20),
+    title VARCHAR(255),
+    addr1 VARCHAR(255),
+    cat2 VARCHAR(50),
+    cat3 VARCHAR(50),
+    content_id VARCHAR(50),
+    content_type_id VARCHAR(10),
+    created_time VARCHAR(20),
+    zipcode VARCHAR(10),
+    overview VARCHAR(5000),
+    cnt int unsigned default 0
+);
+
+-- content_id 컬럼에 PRIMARY KEY 추가 (이미 PRIMARY KEY가 있을 수도 있음)
+ALTER TABLE accommodation ADD PRIMARY KEY (content_id);
+
+
+create table accommodationroom (
+    contentid VARCHAR(255) not null,
+-- 각 숙소의 고유 ID
+contenttypeid VARCHAR(255),
+-- 콘텐츠 유형 ID
+roomtitle VARCHAR(255),
+-- 방 제목
+roomcode VARCHAR(100),
+-- 방 코드
+roomoffseasonminfee1 VARCHAR(255),
+-- 비수기 최소 요금 (소수점 포함)
+roomimg1 VARCHAR(255),
+-- 방 이미지 1 (URL 또는 이미지 경로)
+roomimg1alt VARCHAR(999),
+    roomimg2 VARCHAR(255),
+-- 방 이미지 2 (URL 또는 이미지 경로)
+roomimg2alt VARCHAR(999),
+    roomimg3 VARCHAR(255),
+-- 방 이미지 2 (URL 또는 이미지 경로)
+roomimg3alt VARCHAR(999),
+    roomimg4 VARCHAR(255),
+-- 방 이미지 2 (URL 또는 이미지 경로)
+roomimg4alt VARCHAR(999),
+    roomimg5 VARCHAR(255),
+-- 방 이미지 2 (URL 또는 이미지 경로)
+roomimg5alt VARCHAR(999),
+-- 기본 키 설정
+CONSTRAINT fk_accommodationroom_contentid FOREIGN KEY (contentid) 
+REFERENCES accommodation(content_id) ON DELETE CASCADE
+
+);
+
+
+
+CREATE TABLE course_comment (
+    c_idx INT AUTO_INCREMENT PRIMARY KEY, -- 댓글 ID (기본 키)
+    name varchar(200) NOT NULL,                     -- 작성자 ID (외래 키로 멤버 테이블 참조)
+    content TEXT NOT NULL,                      -- 댓글 내용
+    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP, -- 댓글 작성 시간
+    updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP, -- 댓글 수정 시간
+    is_deleted TINYINT(1) DEFAULT 0,            -- 삭제 여부 (1이면 삭제됨)
+    clike INT DEFAULT 0,
+    unlike INT default 0,
+    content_id varchar(200),
+	gender varchar(5),
+CONSTRAINT fk_course_comment_content_id FOREIGN KEY (content_id) REFERENCES accommodation(content_id) ON DELETE CASCADE
+    );
+
+
+
+
+CREATE TABLE comment_like (
+    like_id INT NOT NULL AUTO_INCREMENT, -- 좋아요/싫어요 기록 ID
+    c_idx INT NOT NULL, -- 댓글 ID (외래 키로 course_comment 테이블 참조)
+    name VARCHAR(50) NOT NULL, -- 사용자 ID
+    action_type ENUM('like', 'dislike', 'none') NOT NULL DEFAULT 'none', -- 좋아요/싫어요/없음
+    created_at TIMESTAMP NULL DEFAULT CURRENT_TIMESTAMP, -- 기록 생성 시간
+    PRIMARY KEY (like_id),
+    UNIQUE KEY c_idx_name (c_idx, name), -- 댓글 ID와 사용자 ID의 조합은 유니크
+    CONSTRAINT fk_comment_like_c_idx FOREIGN KEY (c_idx) REFERENCES course_comment(c_idx) ON DELETE CASCADE
+);
+
+create table festival(
+f_contentid varchar(100),
+f_sigungucode varchar(10) not null,
+f_title varchar(200) not null,
+f_addr1 varchar(1000) not null,
+f_addr2 varchar(100),
+f_eventstartdate varchar(10) not null,
+f_eventenddate varchar(10) not null,
+f_firstimage varchar(2000) not null, #festival의 firstimage
+f_mapx varchar(30) not null,
+f_mapy varchar(30) not null,
+f_areacode varchar(10) not null,
+f_tel varchar(500) not null,
+f_areaname varchar(30),
+f_sigunguname varchar(30),
+constraint festival_pk primary key(f_contentid)
+);
+
+-- member_id 컬럼에 인덱스를 추가
+CREATE INDEX idx_member_id ON member(member_id);
+
+create table support(
+s_idx int unsigned auto_increment,     #게시글 번호
+s_writer varchar(30) not null,        #작성자
+s_category varchar(30) not null,    #카테고리
+s_title varchar(100) not null,        #제목
+s_content varchar(5000) not null,    #내용
+post_date datetime default now(),    #등록일
+update_date datetime default now(), #수정일
+s_status char(1) default 'N',        #게시글 상태(N:삭제요청없음, Y:삭제요청함)
+constraint support_pk primary key (s_idx),     #기본키
+FOREIGN KEY (s_writer) REFERENCES member(member_id) ON DELETE CASCADE #외래키
+);
+
+create table destination(
+d_contentid varchar(300) not null,#콘텐츠아이디
+d_firstimage varchar(1000) not null,#대표이미지
+d_sigungucode varchar(250) not null,#시군구코드
+d_sigunguname varchar(250) ,#시군구이름
+d_areacode varchar(250) not null, #지역코드
+d_areaname varchar(250) ,#지역이름
+d_title varchar(250) not null,#제목(장소)
+d_addr1 varchar(250) not null,#주소
+d_addr2 varchar(250) not null,#상세주소
+d_mapx varchar(250) not null,#x좌표
+d_mapy varchar(250) not null,#y좌표
+constraint destination_pk primary key (d_contentid)#기본키
+);
+
+
+CREATE TABLE products (
+  product_id int NOT NULL AUTO_INCREMENT,
+  addr1 varchar(255) DEFAULT NULL,
+  addr2 varchar(255) DEFAULT NULL,
+  areacode varchar(20) DEFAULT NULL,
+  areaname varchar(20) DEFAULT NULL,
+  booktour varchar(10) DEFAULT NULL,
+  cat1 varchar(50) DEFAULT NULL,
+  cat2 varchar(50) DEFAULT NULL,
+  cat3 varchar(50) DEFAULT NULL,
+  contentid varchar(50) DEFAULT NULL,
+  contenttypeid varchar(50) DEFAULT NULL,
+  createdtime varchar(50) DEFAULT NULL,
+  firstimage varchar(255) DEFAULT NULL,
+  firstimage2 varchar(255) DEFAULT NULL,
+  cpyrhtDivCd varchar(50) DEFAULT NULL,
+  mapx varchar(50) DEFAULT NULL,
+  mapy varchar(50) DEFAULT NULL,
+  mlevel varchar(20) DEFAULT NULL,
+  modifiedtime varchar(50) DEFAULT NULL,
+  sigungucode varchar(20) DEFAULT NULL,
+  sigunguname varchar(30) DEFAULT NULL,
+  tel varchar(500) DEFAULT NULL,
+  title varchar(255) DEFAULT NULL,
+  zipcode varchar(20) DEFAULT NULL,
+  info varchar(1000) DEFAULT NULL,
+  opendate varchar(255) DEFAULT NULL,
+  restdate varchar(255) DEFAULT NULL,
+  price varchar(1000) DEFAULT NULL,
+  usetime varchar(255) DEFAULT NULL,
+  homepage varchar(1000) DEFAULT NULL,
+  infoname1 varchar(20) DEFAULT NULL,
+  infotext1 varchar(3000) DEFAULT NULL,
+  infoname2 varchar(20) DEFAULT NULL,
+  infotext2 varchar(3000) DEFAULT NULL,
+  infoname3 varchar(20) DEFAULT NULL,
+  infotext3 varchar(2000) DEFAULT NULL,
+  infoname4 varchar(20) DEFAULT NULL,
+  infotext4 varchar(900) DEFAULT NULL,
+  enddate varchar(30) DEFAULT NULL,
+overview varchar(2000) DEFAULT NULL,
+  PRIMARY KEY (product_id),
+  UNIQUE KEY unique_contentid (contentid)
+) ; 
+
+CREATE TABLE community (
+    c_idx INT AUTO_INCREMENT PRIMARY KEY,         -- 게시물 ID
+    memberId VARCHAR(50) NOT NULL,                -- 작성자 사용자 이름
+    title VARCHAR(255) NOT NULL,                  -- 게시물 제목
+    content TEXT NOT NULL,                        -- 게시물 내용
+    location VARCHAR(255),                        -- 위치 (null 가능)
+    tag VARCHAR(50),                              -- 태그 (null 가능)
+    rating FLOAT DEFAULT 0,                       -- 별점 (1~5)
+    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,  -- 생성일자
+    updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,  -- 수정일자
+);
+
+
+CREATE TABLE community_comments (
+    comment_id INT AUTO_INCREMENT PRIMARY KEY,    -- 댓글 ID
+    c_idx INT NOT NULL,                           -- 게시물 ID (community 테이블 참조)
+    memberId VARCHAR(50) NOT NULL,                -- 댓글 작성자
+    content TEXT NOT NULL,                        -- 댓글 내용
+    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,  -- 댓글 작성 시간
+    updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,  -- 댓글 수정 시간
+    FOREIGN KEY (c_idx) REFERENCES community(c_idx) ON DELETE CASCADE -- 게시물 삭제 시 댓글도 삭제
+);
+
+CREATE TABLE community_likes (
+    like_id INT AUTO_INCREMENT PRIMARY KEY,       -- 좋아요 ID
+    c_idx INT NOT NULL,                           -- 게시물 ID (community 테이블 참조)
+    memberId VARCHAR(50) NOT NULL,                -- 좋아요한 사용자
+    liked_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,  -- 좋아요 누른 시간
+    FOREIGN KEY (c_idx) REFERENCES community(c_idx) ON DELETE CASCADE,  -- 게시물 삭제 시 좋아요도 삭제
+    UNIQUE (c_idx, memberId)                      -- 같은 사용자가 같은 게시물에 중복으로 좋아요 불가
+);
+
+
+CREATE TABLE image_paths (
+    id INT AUTO_INCREMENT PRIMARY KEY,
+    postId INT NOT NULL, 
+    origin_filename VARCHAR(50),
+    save_filename VARCHAR(50),
+    FOREIGN KEY (postId) REFERENCES community(c_idx) ON DELETE CASCADE
+);
+
+CREATE TABLE member (
+    m_id INT AUTO_INCREMENT PRIMARY KEY,          -- 회원번호 (Primary Key)
+    member_id VARCHAR(50) not null,              -- 회원 ID 
+    password VARCHAR(255) ,           -- 비밀번호 (암호화 필요)
+    birth_date DATE,                 -- 생년월일 (YYYY-MM-DD)
+    phone VARCHAR(15) UNIQUE,        -- 전화번호 (중복 방지)
+    name VARCHAR(100) NOT NULL,               -- 이름
+    email VARCHAR(100) NOT NULL UNIQUE,       -- 이메일 (중복 방지)
+    gender CHAR(1),                  -- 성별 (M: 남성, F: 여성)
+    marketing_consent BOOLEAN DEFAULT FALSE,  -- 마케팅 수신 동의 여부 (기본값: 거부)
+    withdrawal_request char(1) DEFAULT 'N', -- 탈퇴 신청 여부 (기본값: 없음)
+    membership_level char(1) DEFAULT '1',  -- 회원 등급 (일반 등)
+    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP  -- 가입일 (자동 생성)
+);
